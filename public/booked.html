@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Bookings</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+      min-height: 100vh;
+    }
+
+    nav {
+      background: #7c3aed;
+      padding: 15px 30px;
+    }
+
+    nav a {
+      color: white;
+      margin-right: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .card {
+      max-width: 600px;
+      margin: 60px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 18px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+
+    h2 {
+      color: #5b21b6;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: #f5f3ff;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .date {
+      font-weight: bold;
+      color: #4c1d95;
+    }
+
+    .time {
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .cancel-btn {
+      background: transparent;
+      border: 1px solid #c4b5fd;
+      color: #5b21b6;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .cancel-btn:hover {
+      background: #ede9fe;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/home.html">Home</a>
+  <a href="/book.html">Book</a>
+  <a href="/booked.html">My Bookings</a>
+  <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="card">
+  <h2>My Bookings</h2>
+  <div id="list"></div>
+</div>
+
+<script>
+/* 🔒 AUTH */
+if (localStorage.getItem("role") !== "user") {
+  localStorage.clear();
+  location.href = "/user-login.html";
+}
+
+function logout() {
+  localStorage.clear();
+  location.href = "/role.html";
+}
+
+/* FORMAT DATE (REMOVE T18:30:00.000Z) */
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+/* LOAD BOOKINGS */
+function loadBookings() {
+  fetch("/api/bookings/" + localStorage.getItem("username"))
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      if (data.length === 0) {
+        list.innerHTML = "<p>No bookings yet</p>";
+        return;
+      }
+
+      data.forEach(b => {
+        const div = document.createElement("div");
+        div.className = "row";
+        div.innerHTML = `
+          <div class="info">
+            <span class="date">${formatDate(b.booking_date)}</span>
+            <span class="time">${b.time}</span>
+          </div>
+          <button class="cancel-btn"
+            onclick="cancelBooking(${b.id})">
+            Cancel
+          </button>
+        `;
+        list.appendChild(div);
+      });
+    });
+}
+
+/* ✅ CANCEL BY SLOT ID (WORKING) */
+function cancelBooking(slotId) {
+  fetch("/api/cancel", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      slot_id: slotId,
+      username: localStorage.getItem("username")
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message);
+    loadBookings();
+  });
+}
+
+loadBookings();
+</script>
+
+</body>
+</html>

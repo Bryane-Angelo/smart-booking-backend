@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Book Appointment</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <div class="logo">SmartBook</div>
+  <ul>
+    <li><a href="/home.html">Home</a></li>
+    <li><a href="/index.html" class="active">Book</a></li>
+    <li><a href="/booked.html">My Bookings</a></li>
+    <li><a href="#" onclick="logout()">Logout</a></li>
+  </ul>
+</div>
+
+<div class="container">
+  <h2>Book Appointment</h2>
+  <select id="slotSelect"></select>
+  <button onclick="bookSelectedSlot()">Confirm Booking</button>
+</div>
+
+<script src="/script.js"></script>
+</body>
+</html>

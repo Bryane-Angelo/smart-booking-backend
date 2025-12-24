@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login | Smart Booking Platform</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+    }
+
+    .card {
+      width: 360px;
+      background: white;
+      padding: 40px;
+      border-radius: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    h2 {
+      color: #5b21b6;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #c4b5fd;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5b21b6;
+    }
+
+    .error {
+      color: #dc2626;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .back {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .back a {
+      color: #7c3aed;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>Admin Login</h2>
+  <p>Smart Booking Platform</p>
+
+  <input id="username" placeholder="Admin Username">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="loginAdmin()">Login</button>
+
+  <div class="error" id="error"></div>
+
+  <div class="back">
+    <a href="/role.html">← Back to Role Selection</a>
+  </div>
+</div>
+
+<script>
+function loginAdmin() {
+  fetch("/api/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username: username.value,
+      password: password.value,
+      role: "admin"
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.success) {
+      error.innerText = "Invalid admin credentials";
+      return;
+    }
+    localStorage.clear();
+    localStorage.setItem("username", data.username);
+    localStorage.setItem("role", "admin");
+    location.href = "/admin.html";
+  });
+}
+</script>
+
+</body>
+</html>

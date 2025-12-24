@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Booking Platform</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
+      background: white;
+      padding: 45px;
+      width: 360px;
+      border-radius: 18px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    h1 {
+      color: #5b21b6;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #6b7280;
+      margin-bottom: 30px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+    }
+    .user { background: #7c3aed; }
+    .admin { background: #5b21b6; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Smart Booking Platform</h1>
+  <p>Select your role</p>
+
+  <button class="user" onclick="location.href='/user-login.html'">
+    User Login
+  </button>
+
+  <button class="admin" onclick="location.href='/admin-login.html'">
+    Admin Login
+  </button>
+</div>
+
+</body>
+</html>

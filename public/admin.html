@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard | Smart Booking Platform</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    nav {
+      background: #7c3aed;
+      padding: 15px 30px;
+    }
+
+    nav span {
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    nav a {
+      color: white;
+      margin-left: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      float: right;
+    }
+
+    /* CONTAINER */
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+    }
+
+    h2 {
+      color: #5b21b6;
+      margin-bottom: 20px;
+    }
+
+    /* ADD SLOT */
+    .add-slot {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .add-slot input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #c4b5fd;
+      font-size: 15px;
+    }
+
+    .add-slot button {
+      padding: 12px 20px;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .add-slot button:hover {
+      background: #5b21b6;
+    }
+
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #7c3aed;
+      color: white;
+      padding: 12px;
+      text-align: left;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      color: #374151;
+    }
+
+    tr:nth-child(even) {
+      background: #f5f3ff;
+    }
+
+    .status {
+      font-weight: bold;
+      color: #16a34a;
+    }
+
+    .empty {
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span>Smart Booking Platform – Admin</span>
+  <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="container">
+  <h2>Manage Slots & Bookings</h2>
+
+  <!-- ADD SLOT -->
+  <div class="add-slot">
+    <input id="time" placeholder="Enter slot time (e.g. 10:00 AM)">
+    <button onclick="addSlot()">Add Slot</button>
+  </div>
+
+  <!-- BOOKINGS TABLE -->
+  <table>
+    <tr>
+      <th>Slot Time</th>
+      <th>Booked By</th>
+      <th>Status</th>
+    </tr>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<script>
+/* 🔒 ADMIN GUARD */
+if (localStorage.getItem("role") !== "admin") {
+  localStorage.clear();
+  location.href = "/admin-login.html";
+}
+
+function logout() {
+  localStorage.clear();
+  location.href = "/role.html";
+}
+
+function addSlot() {
+  fetch("/api/admin/add-slot", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ time: time.value })
+  })
+  .then(() => location.reload());
+}
+
+fetch("/api/admin/bookings")
+  .then(res => res.json())
+  .then(data => {
+    const tbody = document.getElementById("rows");
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+      tbody.innerHTML =
+        "<tr><td colspan='3' class='empty'>No bookings yet</td></tr>";
+      return;
+    }
+
+    data.forEach(b => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${b.time}</td>
+        <td>${b.booked_by}</td>
+        <td class="status">Booked</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+</script>
+
+</body>
+</html>

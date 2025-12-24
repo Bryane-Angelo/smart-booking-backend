@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Home | Smart Booking Platform</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+      min-height: 100vh;
+    }
+
+    nav {
+      background: #7c3aed;
+      padding: 15px 30px;
+    }
+
+    nav a {
+      color: white;
+      margin-right: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 60px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+
+    h2 {
+      color: #5b21b6;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #5b21b6;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/home.html">Home</a>
+  <a href="/book.html">Book Appointment</a>
+  <a href="/booked.html">My Bookings</a>
+  <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="container">
+  <h2>Welcome, <span id="name"></span></h2>
+
+  <button class="btn" onclick="location.href='/book.html'">
+    Book Appointment
+  </button>
+
+  <button class="btn" onclick="location.href='/booked.html'">
+    View My Bookings
+  </button>
+</div>
+
+<script>
+if (localStorage.getItem("role") !== "user") {
+  localStorage.clear();
+  location.href = "/user-login.html";
+}
+
+document.getElementById("name").innerText =
+  localStorage.getItem("username");
+
+function logout() {
+  localStorage.clear();
+  location.href = "/role.html";
+}
+</script>
+
+</body>
+</html>
