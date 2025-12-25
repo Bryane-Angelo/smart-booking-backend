@@ -128,10 +128,10 @@ function cancelBooking(id) {
   })
   .then(res => res.json())
   .then(() => {
-    loadBookings(); // 🔥 THIS IS THE KEY FIX
+    alert("Booking cancelled successfully");
+    location.reload(); // ✅ FORCE REFRESH
   });
 }
-
 loadBookings();
 </script>
 
