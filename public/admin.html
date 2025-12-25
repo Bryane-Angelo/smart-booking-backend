@@ -15,6 +15,19 @@
       padding: 15px 30px;
       color: white;
       font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav button {
+      background: white;
+      color: #5b21b6;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     .card {
@@ -62,7 +75,8 @@
 <body>
 
 <nav>
-  ADMIN DASHBOARD — SMART BOOKING PLATFORM
+  <div>ADMIN DASHBOARD — SMART BOOKING PLATFORM</div>
+  <button onclick="logout()">Logout</button>
 </nav>
 
 <div class="card">
@@ -86,6 +100,11 @@
 if (localStorage.getItem("role") !== "admin") {
   localStorage.clear();
   location.href = "/admin-login.html";
+}
+
+function logout() {
+  localStorage.clear();
+  location.href = "/role.html";
 }
 
 const rows = document.getElementById("rows");
@@ -130,9 +149,7 @@ function cancelBooking(id) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ booking_id: id })
   })
-  .then(() => {
-    loadAdminBookings();
-  });
+  .then(() => loadAdminBookings());
 }
 
 loadAdminBookings();
