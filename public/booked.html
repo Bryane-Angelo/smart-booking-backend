@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Bookings | Smart Booking</title>
-
+  <title>My Bookings</title>
   <style>
     body {
       margin: 0;
@@ -40,9 +39,9 @@
 
     .booking {
       border: 1px solid #ddd;
-      padding: 15px;
+      padding: 16px;
+      border-radius: 12px;
       margin-bottom: 15px;
-      border-radius: 10px;
       background: #fafafa;
     }
 
@@ -50,10 +49,10 @@
       background: #dc2626;
       color: white;
       border: none;
-      padding: 10px;
+      padding: 10px 14px;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 10px;
+      font-weight: bold;
     }
 
     .cancel-btn:hover {
@@ -61,7 +60,6 @@
     }
   </style>
 </head>
-
 <body>
 
 <nav>
@@ -77,31 +75,30 @@
 </div>
 
 <script>
-/* 🔐 AUTH CHECK */
+/* 🔒 AUTH CHECK */
 if (localStorage.getItem("role") !== "user") {
   localStorage.clear();
   location.href = "/user-login.html";
 }
 
-/* LOGOUT */
 function logout() {
   localStorage.clear();
   location.href = "/role.html";
 }
 
-const container = document.getElementById("list");
+const list = document.getElementById("list");
 
-/* LOAD BOOKINGS */
+/* 📥 LOAD BOOKINGS */
 function loadBookings() {
   const username = localStorage.getItem("username");
 
   fetch(`https://smart-booking-backend.vercel.app/api/bookings?username=${username}`)
     .then(res => res.json())
     .then(data => {
-      container.innerHTML = "";
+      list.innerHTML = "";
 
       if (!data || data.length === 0) {
-        container.innerHTML = "<p>No bookings found</p>";
+        list.innerHTML = "<p>No bookings found</p>";
         return;
       }
 
@@ -117,15 +114,16 @@ function loadBookings() {
           </button>
         `;
 
-        container.appendChild(div);
+        list.appendChild(div);
       });
     })
-    .catch(() => {
-      container.innerHTML = "<p>Error loading bookings</p>";
+    .catch(err => {
+      console.error(err);
+      list.innerHTML = "<p>Error loading bookings</p>";
     });
 }
 
-/* CANCEL BOOKING */
+/* ❌ CANCEL BOOKING */
 function cancelBooking(id) {
   if (!confirm("Are you sure you want to cancel this booking?")) return;
 
@@ -136,8 +134,12 @@ function cancelBooking(id) {
   })
   .then(res => res.json())
   .then(data => {
-    alert(data.message);
+    alert(data.message);   // ✅ no more "undefined"
     loadBookings();
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Failed to cancel booking");
   });
 }
 
