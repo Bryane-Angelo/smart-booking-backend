@@ -38,9 +38,9 @@
     }
 
     .booking {
+      padding: 15px;
       border: 1px solid #ddd;
-      padding: 16px;
-      border-radius: 12px;
+      border-radius: 10px;
       margin-bottom: 15px;
       background: #fafafa;
     }
@@ -52,11 +52,7 @@
       padding: 10px 14px;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: bold;
-    }
-
-    .cancel-btn:hover {
-      background: #b91c1c;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -71,7 +67,7 @@
 
 <div class="card">
   <h2>My Bookings</h2>
-  <div id="list"></div>
+  <div id="bookings"></div>
 </div>
 
 <script>
@@ -86,19 +82,19 @@ function logout() {
   location.href = "/role.html";
 }
 
-const list = document.getElementById("list");
+const container = document.getElementById("bookings");
 
-/* 📥 LOAD BOOKINGS */
+/* LOAD BOOKINGS */
 function loadBookings() {
   const username = localStorage.getItem("username");
 
   fetch(`https://smart-booking-backend.vercel.app/api/bookings?username=${username}`)
     .then(res => res.json())
     .then(data => {
-      list.innerHTML = "";
+      container.innerHTML = "";
 
-      if (!data || data.length === 0) {
-        list.innerHTML = "<p>No bookings found</p>";
+      if (!data.length) {
+        container.innerHTML = "<p>No bookings found</p>";
         return;
       }
 
@@ -114,16 +110,12 @@ function loadBookings() {
           </button>
         `;
 
-        list.appendChild(div);
+        container.appendChild(div);
       });
-    })
-    .catch(err => {
-      console.error(err);
-      list.innerHTML = "<p>Error loading bookings</p>";
     });
 }
 
-/* ❌ CANCEL BOOKING */
+/* CANCEL BOOKING */
 function cancelBooking(id) {
   if (!confirm("Are you sure you want to cancel this booking?")) return;
 
@@ -132,14 +124,9 @@ function cancelBooking(id) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ booking_id: id })
   })
-  .then(res => res.json())
-  .then(data => {
-    alert(data.message);   // ✅ no more "undefined"
+  .then(() => {
+    alert("Booking cancelled successfully ✅");
     loadBookings();
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Failed to cancel booking");
   });
 }
 
