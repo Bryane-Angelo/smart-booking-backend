@@ -2,32 +2,51 @@ import pool from "./db.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({
+      success: false,
+      message: "Method not allowed"
+    });
   }
 
-  const { slot_id, username } = req.body;
+  const { username, password, role } = req.body;
 
-  if (!slot_id || !username) {
-    return res.status(400).json({ error: "Missing data" });
+  if (!username || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Username and password required"
+    });
   }
 
   try {
+    // Check if user already exists
     const check = await pool.query(
-      "SELECT is_booked FROM slots WHERE id=$1",
-      [slot_id]
+      "SELECT id FROM users WHERE username = $1",
+      [username]
     );
 
-    if (check.rows.length === 0 || check.rows[0].is_booked) {
-      return res.status(409).json({ error: "Slot already booked" });
+    if (check.rows.length > 0) {
+      return res.json({
+        success: false,
+        message: "Username already exists"
+      });
     }
 
+    // Insert user
     await pool.query(
-      "UPDATE slots SET is_booked=true, booked_by=$1 WHERE id=$2",
-      [username, slot_id]
+      "INSERT INTO users (username, password, role) VALUES ($1, $2, $3)",
+      [username, password, role || "user"]
     );
 
-    res.json({ message: "Booking confirmed" });
-  } catch {
-    res.status(500).json({ error: "Booking failed" });
+    return res.json({
+      success: true,
+      message: "Account created successfully"
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
   }
 }
