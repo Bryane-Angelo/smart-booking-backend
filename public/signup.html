@@ -37,11 +37,6 @@
       outline: none;
     }
 
-    input:focus {
-      border-color: #7c3aed;
-      box-shadow: 0 0 0 2px rgba(124,58,237,0.2);
-    }
-
     button {
       width: 100%;
       padding: 14px;
@@ -63,6 +58,10 @@
       margin-top: 15px;
       font-size: 14px;
       color: #dc2626;
+    }
+
+    .success {
+      color: #16a34a;
     }
 
     .back {
@@ -98,22 +97,41 @@
 function signup() {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
+  const msg = document.getElementById("msg");
+
+  msg.innerText = "";
+  msg.className = "msg";
 
   if (!username || !password) {
-    document.getElementById("msg").innerText =
-      "Username and password cannot be empty";
+    msg.innerText = "Username and password cannot be empty";
     return;
   }
 
   fetch("https://smart-booking-backend.vercel.app/api/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({
+      username,
+      password,
+      role: "user"
+    })
   })
   .then(res => res.json())
   .then(data => {
-    document.getElementById("msg").innerText =
-      data.success ? "Account created successfully" : data.message;
+    if (!data.success) {
+      msg.innerText = data.message;
+      return;
+    }
+
+    msg.classList.add("success");
+    msg.innerText = "Account created successfully! Redirecting...";
+
+    setTimeout(() => {
+      window.location.href = "/user-login.html";
+    }, 1200);
+  })
+  .catch(() => {
+    msg.innerText = "Server error. Please try again.";
   });
 }
 </script>
