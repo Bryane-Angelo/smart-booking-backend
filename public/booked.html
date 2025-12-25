@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Bookings</title>
+  <title>My Bookings | Smart Booking</title>
+
   <style>
     body {
       margin: 0;
@@ -38,14 +39,29 @@
     }
 
     .booking {
-      padding: 14px;
       border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
       border-radius: 10px;
-      margin-bottom: 12px;
       background: #fafafa;
+    }
+
+    .cancel-btn {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .cancel-btn:hover {
+      background: #b91c1c;
     }
   </style>
 </head>
+
 <body>
 
 <nav>
@@ -61,39 +77,71 @@
 </div>
 
 <script>
-/* 🔒 AUTH */
+/* 🔐 AUTH CHECK */
 if (localStorage.getItem("role") !== "user") {
   localStorage.clear();
   location.href = "/user-login.html";
 }
 
+/* LOGOUT */
 function logout() {
   localStorage.clear();
   location.href = "/role.html";
 }
 
-const username = localStorage.getItem("username");
+const container = document.getElementById("list");
 
-fetch(`https://smart-booking-backend.vercel.app/api/bookings?username=${username}`)
+/* LOAD BOOKINGS */
+function loadBookings() {
+  const username = localStorage.getItem("username");
+
+  fetch(`https://smart-booking-backend.vercel.app/api/bookings?username=${username}`)
+    .then(res => res.json())
+    .then(data => {
+      container.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        container.innerHTML = "<p>No bookings found</p>";
+        return;
+      }
+
+      data.forEach(b => {
+        const div = document.createElement("div");
+        div.className = "booking";
+
+        div.innerHTML = `
+          <p><b>Time:</b> ${b.time}</p>
+          <p><b>Date:</b> ${new Date(b.booking_date).toDateString()}</p>
+          <button class="cancel-btn" onclick="cancelBooking(${b.id})">
+            Cancel Booking
+          </button>
+        `;
+
+        container.appendChild(div);
+      });
+    })
+    .catch(() => {
+      container.innerHTML = "<p>Error loading bookings</p>";
+    });
+}
+
+/* CANCEL BOOKING */
+function cancelBooking(id) {
+  if (!confirm("Are you sure you want to cancel this booking?")) return;
+
+  fetch("https://smart-booking-backend.vercel.app/api/cancel", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ booking_id: id })
+  })
   .then(res => res.json())
   .then(data => {
-    const list = document.getElementById("list");
-
-    if (!data.length) {
-      list.innerHTML = "<p>No bookings found</p>";
-      return;
-    }
-
-    data.forEach(b => {
-      const div = document.createElement("div");
-      div.className = "booking";
-      div.innerHTML = `
-        <strong>Time:</strong> ${b.time}<br>
-        <strong>Date:</strong> ${new Date(b.booking_date).toDateString()}
-      `;
-      list.appendChild(div);
-    });
+    alert(data.message);
+    loadBookings();
   });
+}
+
+loadBookings();
 </script>
 
 </body>
