@@ -38,7 +38,7 @@
     }
 
     .booking {
-      padding: 15px;
+      padding: 16px;
       border: 1px solid #ddd;
       border-radius: 12px;
       margin-bottom: 15px;
@@ -67,11 +67,11 @@
 
 <div class="card">
   <h2>My Bookings</h2>
-  <div id="list"></div>
+  <div id="bookings"></div>
 </div>
 
 <script>
-/* 🔒 AUTH */
+/* 🔐 AUTH */
 if (localStorage.getItem("role") !== "user") {
   localStorage.clear();
   location.href = "/user-login.html";
@@ -82,37 +82,39 @@ function logout() {
   location.href = "/role.html";
 }
 
-const list = document.getElementById("list");
+const container = document.getElementById("bookings");
 
 /* 🔄 LOAD BOOKINGS */
 function loadBookings() {
   const username = localStorage.getItem("username");
 
-  fetch(`https://smart-booking-backend.vercel.app/api/bookings?username=${username}`)
-    .then(res => res.json())
-    .then(data => {
-      list.innerHTML = "";
+  fetch(`https://smart-booking-backend.vercel.app/api/bookings?username=${username}`, {
+    cache: "no-store"
+  })
+  .then(res => res.json())
+  .then(data => {
+    container.innerHTML = "";
 
-      if (data.length === 0) {
-        list.innerHTML = "<p style='text-align:center'>No bookings found</p>";
-        return;
-      }
+    if (!data || data.length === 0) {
+      container.innerHTML = "<p style='text-align:center'>No bookings found</p>";
+      return;
+    }
 
-      data.forEach(b => {
-        const div = document.createElement("div");
-        div.className = "booking";
+    data.forEach(b => {
+      const div = document.createElement("div");
+      div.className = "booking";
 
-        div.innerHTML = `
-          <p><b>Time:</b> ${b.time}</p>
-          <p><b>Date:</b> ${new Date(b.booking_date).toDateString()}</p>
-          <button class="cancel-btn" onclick="cancelBooking(${b.id})">
-            Cancel Booking
-          </button>
-        `;
+      div.innerHTML = `
+        <p><b>Time:</b> ${b.time}</p>
+        <p><b>Date:</b> ${new Date(b.booking_date).toDateString()}</p>
+        <button class="cancel-btn" onclick="cancelBooking(${b.id})">
+          Cancel Booking
+        </button>
+      `;
 
-        list.appendChild(div);
-      });
+      container.appendChild(div);
     });
+  });
 }
 
 /* ❌ CANCEL BOOKING */
@@ -125,9 +127,8 @@ function cancelBooking(id) {
     body: JSON.stringify({ booking_id: id })
   })
   .then(res => res.json())
-  .then(data => {
-    alert("Booking cancelled successfully ✅");
-    loadBookings(); // ✅ THIS removes it from UI
+  .then(() => {
+    loadBookings(); // 🔥 THIS IS THE KEY FIX
   });
 }
 
