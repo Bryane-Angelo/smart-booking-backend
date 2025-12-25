@@ -37,44 +37,12 @@
       margin-bottom: 25px;
     }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .booking {
       padding: 14px;
-      margin-bottom: 12px;
-      background: #f5f3ff;
+      border: 1px solid #ddd;
       border-radius: 10px;
-      font-size: 15px;
-    }
-
-    .info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .date {
-      font-weight: bold;
-      color: #4c1d95;
-    }
-
-    .time {
-      color: #374151;
-      font-size: 14px;
-    }
-
-    .cancel-btn {
-      background: transparent;
-      border: 1px solid #c4b5fd;
-      color: #5b21b6;
-      padding: 6px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .cancel-btn:hover {
-      background: #ede9fe;
+      margin-bottom: 12px;
+      background: #fafafa;
     }
   </style>
 </head>
@@ -104,65 +72,28 @@ function logout() {
   location.href = "/role.html";
 }
 
-/* FORMAT DATE (REMOVE T18:30:00.000Z) */
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
-}
+const username = localStorage.getItem("username");
 
-/* LOAD BOOKINGS */
-function loadBookings() {
-  fetch("/api/bookings/" + localStorage.getItem("username"))
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById("list");
-      list.innerHTML = "";
-
-      if (data.length === 0) {
-        list.innerHTML = "<p>No bookings yet</p>";
-        return;
-      }
-
-      data.forEach(b => {
-        const div = document.createElement("div");
-        div.className = "row";
-        div.innerHTML = `
-          <div class="info">
-            <span class="date">${formatDate(b.booking_date)}</span>
-            <span class="time">${b.time}</span>
-          </div>
-          <button class="cancel-btn"
-            onclick="cancelBooking(${b.id})">
-            Cancel
-          </button>
-        `;
-        list.appendChild(div);
-      });
-    });
-}
-
-/* ✅ CANCEL BY SLOT ID (WORKING) */
-function cancelBooking(slotId) {
-  fetch("/api/cancel", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      slot_id: slotId,
-      username: localStorage.getItem("username")
-    })
-  })
+fetch(`https://smart-booking-backend.vercel.app/api/bookings?username=${username}`)
   .then(res => res.json())
   .then(data => {
-    alert(data.message);
-    loadBookings();
-  });
-}
+    const list = document.getElementById("list");
 
-loadBookings();
+    if (!data.length) {
+      list.innerHTML = "<p>No bookings found</p>";
+      return;
+    }
+
+    data.forEach(b => {
+      const div = document.createElement("div");
+      div.className = "booking";
+      div.innerHTML = `
+        <strong>Time:</strong> ${b.time}<br>
+        <strong>Date:</strong> ${new Date(b.booking_date).toDateString()}
+      `;
+      list.appendChild(div);
+    });
+  });
 </script>
 
 </body>
