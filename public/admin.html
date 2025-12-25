@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin Dashboard | Smart Booking Platform</title>
+  <title>Admin Dashboard | Smart Booking</title>
   <style>
     body {
       margin: 0;
@@ -10,173 +10,132 @@
       min-height: 100vh;
     }
 
-    /* NAVBAR */
     nav {
-      background: #7c3aed;
+      background: #5b21b6;
       padding: 15px 30px;
-    }
-
-    nav span {
       color: white;
-      font-size: 18px;
       font-weight: bold;
     }
 
-    nav a {
-      color: white;
-      margin-left: 25px;
-      text-decoration: none;
-      font-weight: bold;
-      float: right;
-    }
-
-    /* CONTAINER */
-    .container {
+    .card {
       max-width: 900px;
-      margin: 40px auto;
+      margin: 50px auto;
       background: white;
       padding: 30px;
-      border-radius: 14px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+      border-radius: 18px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
 
     h2 {
       color: #5b21b6;
-      margin-bottom: 20px;
+      text-align: center;
+      margin-bottom: 25px;
     }
 
-    /* ADD SLOT */
-    .add-slot {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-
-    .add-slot input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #c4b5fd;
-      font-size: 15px;
-    }
-
-    .add-slot button {
-      padding: 12px 20px;
-      background: #7c3aed;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-
-    .add-slot button:hover {
-      background: #5b21b6;
-    }
-
-    /* TABLE */
     table {
       width: 100%;
       border-collapse: collapse;
     }
 
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
     th {
-      background: #7c3aed;
+      background: #ede9fe;
+      color: #4c1d95;
+    }
+
+    .cancel-btn {
+      background: #dc2626;
       color: white;
-      padding: 12px;
-      text-align: left;
-    }
-
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #e5e7eb;
-      color: #374151;
-    }
-
-    tr:nth-child(even) {
-      background: #f5f3ff;
-    }
-
-    .status {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
       font-weight: bold;
-      color: #16a34a;
-    }
-
-    .empty {
-      color: #9ca3af;
     }
   </style>
 </head>
 <body>
 
 <nav>
-  <span>Smart Booking Platform – Admin</span>
-  <a href="#" onclick="logout()">Logout</a>
+  ADMIN DASHBOARD — SMART BOOKING PLATFORM
 </nav>
 
-<div class="container">
-  <h2>Manage Slots & Bookings</h2>
+<div class="card">
+  <h2>All Active Bookings</h2>
 
-  <!-- ADD SLOT -->
-  <div class="add-slot">
-    <input id="time" placeholder="Enter slot time (e.g. 10:00 AM)">
-    <button onclick="addSlot()">Add Slot</button>
-  </div>
-
-  <!-- BOOKINGS TABLE -->
   <table>
-    <tr>
-      <th>Slot Time</th>
-      <th>Booked By</th>
-      <th>Status</th>
-    </tr>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Action</th>
+      </tr>
+    </thead>
     <tbody id="rows"></tbody>
   </table>
 </div>
 
 <script>
-/* 🔒 ADMIN GUARD */
+/* 🔒 ADMIN AUTH */
 if (localStorage.getItem("role") !== "admin") {
   localStorage.clear();
   location.href = "/admin-login.html";
 }
 
-function logout() {
-  localStorage.clear();
-  location.href = "/role.html";
+const rows = document.getElementById("rows");
+
+/* LOAD ALL BOOKINGS */
+function loadAdminBookings() {
+  fetch("https://smart-booking-backend.vercel.app/api/admin-bookings")
+    .then(res => res.json())
+    .then(data => {
+      rows.innerHTML = "";
+
+      if (data.length === 0) {
+        rows.innerHTML = "<tr><td colspan='4'>No active bookings</td></tr>";
+        return;
+      }
+
+      data.forEach(b => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${b.booked_by}</td>
+          <td>${new Date(b.booking_date).toDateString()}</td>
+          <td>${b.time}</td>
+          <td>
+            <button class="cancel-btn" onclick="cancelBooking(${b.id})">
+              Cancel
+            </button>
+          </td>
+        `;
+
+        rows.appendChild(tr);
+      });
+    });
 }
 
-function addSlot() {
-  fetch("/api/admin/add-slot", {
+/* ADMIN CANCEL */
+function cancelBooking(id) {
+  if (!confirm("Cancel this booking?")) return;
+
+  fetch("https://smart-booking-backend.vercel.app/api/cancel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ time: time.value })
+    body: JSON.stringify({ booking_id: id })
   })
-  .then(() => location.reload());
+  .then(() => {
+    loadAdminBookings();
+  });
 }
 
-fetch("/api/admin/bookings")
-  .then(res => res.json())
-  .then(data => {
-    const tbody = document.getElementById("rows");
-    tbody.innerHTML = "";
-
-    if (data.length === 0) {
-      tbody.innerHTML =
-        "<tr><td colspan='3' class='empty'>No bookings yet</td></tr>";
-      return;
-    }
-
-    data.forEach(b => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${b.time}</td>
-        <td>${b.booked_by}</td>
-        <td class="status">Booked</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  });
+loadAdminBookings();
 </script>
 
 </body>
