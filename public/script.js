@@ -1,7 +1,7 @@
 function login() {
   const role = localStorage.getItem("role");
 
-  fetch("/api/login", {
+   fetch("https://smart-booking-backend.vercel.app/api/login", {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({

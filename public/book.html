@@ -107,7 +107,7 @@ dateInput.addEventListener("change", loadSlots);
 
 /* LOAD SLOTS */
 function loadSlots() {
-  fetch(`/api/slots?date=${dateInput.value}`)
+  fetch(`https://smart-booking-backend.vercel.app/api/slots?date=${date}`)
     .then(res => res.json())
     .then(data => {
       const slots = document.getElementById("slots");
@@ -140,7 +140,7 @@ function book() {
     return;
   }
 
-  fetch("/api/book", {
+  fetch("https://smart-booking-backend.vercel.app/api/book", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

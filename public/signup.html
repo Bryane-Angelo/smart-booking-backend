@@ -105,7 +105,7 @@ function signup() {
     return;
   }
 
-  fetch("/api/signup", {
+  fetch("https://smart-booking-backend.vercel.app/api/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password })
