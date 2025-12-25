@@ -76,17 +76,14 @@
 <div class="card">
   <h2>Book Appointment</h2>
 
-  <!-- DATE PICKER -->
   <input type="date" id="date">
-
-  <!-- SLOT DROPDOWN -->
   <select id="slots"></select>
 
   <button onclick="book()">Confirm Booking</button>
 </div>
 
 <script>
-/* 🔒 AUTH */
+/* AUTH */
 if (localStorage.getItem("role") !== "user") {
   localStorage.clear();
   location.href = "/user-login.html";
@@ -97,12 +94,11 @@ function logout() {
   location.href = "/role.html";
 }
 
-/* 🚫 DISABLE PAST DATES */
+/* DATE SETUP */
 const dateInput = document.getElementById("date");
 const today = new Date().toISOString().split("T")[0];
 dateInput.min = today;
 dateInput.value = today;
-
 dateInput.addEventListener("change", loadSlots);
 
 /* LOAD SLOTS */
@@ -125,7 +121,8 @@ function loadSlots() {
       data.forEach(s => {
         const opt = document.createElement("option");
         opt.value = s.id;
-        opt.text = s.time;
+        opt.text = s.time + (s.is_booked ? " (Booked)" : "");
+        opt.disabled = s.is_booked;
         slots.appendChild(opt);
       });
     });
@@ -133,7 +130,7 @@ function loadSlots() {
 
 loadSlots();
 
-/* BOOK */
+/* BOOK SLOT */
 function book() {
   const slotId = document.getElementById("slots").value;
 
