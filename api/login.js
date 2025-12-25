@@ -21,8 +21,8 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    res.status(200).json({ message: "Login success", role });
-  } catch {
-    res.status(500).json({ error: "Login failed" });
+    res.json({ message: "Login success", role });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
 }
