@@ -1,3 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Appointment</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+      min-height: 100vh;
+    }
+
+    nav {
+      background: #7c3aed;
+      padding: 15px 30px;
+    }
+
+    nav a {
+      color: white;
+      margin-right: 20px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .card {
+      max-width: 480px;
+      margin: 60px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 18px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    h2 {
+      color: #5b21b6;
+      margin-bottom: 25px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px;
+      margin: 12px 0;
+      border-radius: 10px;
+      border: 1px solid #c4b5fd;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 20px;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #5b21b6;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/home.html">Home</a>
+  <a href="/book.html">Book</a>
+  <a href="/booked.html">My Bookings</a>
+  <a href="#" onclick="logout()">Logout</a>
+</nav>
+
+<div class="card">
+  <h2>Book Appointment</h2>
+
+  <input type="date" id="date">
+  <select id="slots"></select>
+
+  <button onclick="book()">Confirm Booking</button>
+</div>
+
 <script>
 /* 🔒 AUTH */
 if (localStorage.getItem("role") !== "user") {
@@ -73,3 +158,6 @@ function book() {
   });
 }
 </script>
+
+</body>
+</html>
