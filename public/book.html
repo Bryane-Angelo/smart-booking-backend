@@ -1,90 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Appointment</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #ede9fe, #f5f3ff);
-      min-height: 100vh;
-    }
-
-    nav {
-      background: #7c3aed;
-      padding: 15px 30px;
-    }
-
-    nav a {
-      color: white;
-      margin-right: 20px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .card {
-      max-width: 480px;
-      margin: 60px auto;
-      background: white;
-      padding: 40px;
-      border-radius: 18px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-      text-align: center;
-    }
-
-    h2 {
-      color: #5b21b6;
-      margin-bottom: 25px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 14px;
-      margin: 12px 0;
-      border-radius: 10px;
-      border: 1px solid #c4b5fd;
-      font-size: 15px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 20px;
-      background: #7c3aed;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background: #5b21b6;
-    }
-  </style>
-</head>
-<body>
-
-<nav>
-  <a href="/home.html">Home</a>
-  <a href="/book.html">Book</a>
-  <a href="/booked.html">My Bookings</a>
-  <a href="#" onclick="logout()">Logout</a>
-</nav>
-
-<div class="card">
-  <h2>Book Appointment</h2>
-
-  <input type="date" id="date">
-  <select id="slots"></select>
-
-  <button onclick="book()">Confirm Booking</button>
-</div>
-
 <script>
-/* AUTH */
+/* 🔒 AUTH */
 if (localStorage.getItem("role") !== "user") {
   localStorage.clear();
   location.href = "/user-login.html";
@@ -100,19 +15,16 @@ const dateInput = document.getElementById("date");
 const today = new Date().toISOString().split("T")[0];
 dateInput.min = today;
 dateInput.value = today;
-dateInput.addEventListener("change", loadSlots);
 
-/* LOAD SLOTS */
-function loadSlots() {
-  const selectedDate = dateInput.value;
-
-  fetch(`https://smart-booking-backend.vercel.app/api/slots?date=${selectedDate}`)
+/* LOAD SLOTS FOR A GIVEN DATE */
+function loadSlots(forDate) {
+  fetch(`https://smart-booking-backend.vercel.app/api/slots?date=${forDate}`)
     .then(res => res.json())
     .then(data => {
       const slots = document.getElementById("slots");
       slots.innerHTML = "";
 
-      if (data.length === 0) {
+      if (!data || data.length === 0) {
         const opt = document.createElement("option");
         opt.text = "No slots available";
         slots.appendChild(opt);
@@ -129,7 +41,13 @@ function loadSlots() {
     });
 }
 
-loadSlots();
+/* LOAD TODAY SLOTS ON PAGE LOAD */
+loadSlots(today);
+
+/* LOAD WHEN DATE CHANGES */
+dateInput.addEventListener("change", () => {
+  loadSlots(dateInput.value);
+});
 
 /* BOOK SLOT */
 function book() {
@@ -151,10 +69,7 @@ function book() {
   .then(res => res.json())
   .then(data => {
     alert(data.message);
-    loadSlots();
+    loadSlots(dateInput.value);
   });
 }
 </script>
-
-</body>
-</html>
